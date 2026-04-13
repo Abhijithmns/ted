@@ -5,11 +5,11 @@ set(CMAKE_C_STANDARD 99)
 
 include_directories(include)
 
-add_executable(editor
+add_executable(ted
     src/main.c
     src/editor.c
     src/gap_buffer.c
 )
 
-target_link_libraries(editor ncurses)
+target_link_libraries(ted ncurses)
 
