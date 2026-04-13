@@ -62,7 +62,7 @@ void gb_move_gap_to_point(GapBuffer *gb) {
 
         size_t n = gb->gapstart - gb->point; 
 
-        gb_copy_bytes(gb,gb->gapend - n,gb->point,n);
+        gb_copy_bytes(gb,gb->gapend - n,gb->point,n); // copy n bytes to right side
         gb->gapstart -= n;
         gb->gapend   -= n;
     }
@@ -74,7 +74,7 @@ void gb_move_gap_to_point(GapBuffer *gb) {
 
         size_t n = gb->point - gb->gapend;
 
-        gb_copy_bytes(gb,gb->gapstart,gb->gapend,n);
+        gb_copy_bytes(gb,gb->gapstart,gb->gapend,n); // copy n bytes to the left side
         gb->gapstart += n;
         gb->gapend   += n;
     }
@@ -101,6 +101,7 @@ void gb_expand_buffer(GapBuffer *gb,size_t size) {
 }
 
 void gb_expand_gap(GapBuffer *gb,size_t size) {
+    //ensuring insert has enough space
     if(size > gb_size_of_gap(gb)) {
         size+=gb->GAP_SIZE;
         gb_expand_buffer(gb,size);
@@ -121,7 +122,7 @@ size_t gb_size_of_gap(GapBuffer *gb){
     return (size_t)(gb->gapend - gb->gapstart);
 }
 
-size_t gb_buffer_size(GapBuffer *gb) {
+size_t gb_buffer_size(GapBuffer *gb) { // returns the text size
     return (size_t)((gb->bufend - gb->buffer) - (gb->gapend - gb->gapstart));
 }
 
@@ -163,6 +164,7 @@ char gb_next_char(GapBuffer *gb) {
     if(gb->point == gb->gapstart) {
         gb->point = gb->gapend;
     }
+    if(gb->point >= gb->bufend) return '\0';
     return *gb->point;
 }
 
@@ -222,9 +224,7 @@ void gb_insert_string(GapBuffer *gb, const char *str, size_t len) {
         gb_expand_gap(gb,len);
     }
 
-    for(size_t i=0;i<len;i++) {
-        gb->gapstart[i] = str[i];
-    }
+    memcpy(gb->gapstart, str, len);
     gb->gapstart+=len;
     gb->point = gb->gapstart;
 }
