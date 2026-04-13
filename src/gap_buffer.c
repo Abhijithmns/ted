@@ -4,6 +4,7 @@
 #include <stddef.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 GapBuffer *gb_create(size_t GAP_SIZE) {
     GapBuffer *gb = (GapBuffer *)malloc(sizeof(GapBuffer));
@@ -42,26 +43,8 @@ int gb_copy_bytes(GapBuffer *gb,char *dest,char *src,size_t len) {
     if((dest == src) || len == 0) {
         return 1;
     }
-    //check to make sure that we dont go beyond the buffer
-    if(src > dest) {
-        if((src + len) > gb->bufend) { 
-            return 0;
-        }
-        for(;len>0;len--) {
-            *(dest++) = *(src++);
-        }
-    }
-    else {
-        //to prevent overwriting the charecters we need to move forward and copy
-        src+=len;
-        dest+=len;
-
-        for(;len>0;len--) {
-            //predecrement because we start one byte beyond where we want after adding the length.
-            *(--dest) = *(--src);
-        }
-
-    }
+    if((src + len) > gb->bufend) return 0;
+    memmove(dest,src,len);
     return 1;
 }
 
